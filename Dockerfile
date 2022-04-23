@@ -14,9 +14,12 @@ RUN sudo dpkg -i packages-microsoft-prod.deb
 RUN sudo apt-get update
 RUN sudo apt-get install -y powershell
 # INSTALL NODE
-RUN curl -fsSL https://deb.nodesource.com/setup_17.x | sudo -E bash -
-RUN sudo apt install -y nodejs
+RUN wget "https://nodejs.org/dist/v18.0.0/node-v18.0.0-linux-x64.tar.xz" -O "./node-v18.0.0-linux-x64.tar.xz"
+RUN sudo mkdir -p /usr/local/lib/nodejs
+RUN sudo tar -xJvf "node-v18.0.0-linux-x64.tar.xz" -C /usr/local/lib/nodejs
+RUN rm node-v18.0.0-linux-x64.tar.xz
+RUN echo "export PATH=/usr/local/lib/nodejs/node-v18.0.0-linux-x64/bin:$PATH" >> ~/.bashrc
 # SET WORKING ENVIRONMENT
 WORKDIR /home/dealii
-CMD ["pwsh"]
+CMD ["bash"]
 EXPOSE 3000
