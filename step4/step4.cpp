@@ -26,7 +26,9 @@
 
 using namespace dealii;
 
-#define USE(X) (void)(X);
+#define USE(X)                                                                 \
+  (void)(X); // this macro does nothing, it's just for
+             // disable unused variable warnings
 
 template <int dim> class Step4 {
 public:
@@ -51,8 +53,37 @@ private:
   Vector<double> system_rhs;
 };
 
+template <int dim> class RightHandSide : public Function<dim> {
+public:
+  virtual double value(const Point<dim> &p,
+                       const unsigned int component = 0) const override;
+};
+
+template <int dim> class BoundaryValues : public Function<dim> {
+public:
+  virtual double value(const Point<dim> &p,
+                       const unsigned int component = 0) const override;
+};
+
 int main(int argc, char **argv) {
   USE(argc);
   USE(argv);
   return 0;
+}
+
+template <int dim>
+double RightHandSide<dim>::value(const Point<dim> &p,
+                                 const unsigned int component) const {
+  USE(component);
+  double return_value = 0.0;
+  for (unsigned int i = 0; i < dim; ++i)
+    return_value += 4.0 + std::pow(p(i), 4.0);
+  return return_value;
+}
+
+template <int dim>
+double BoundaryValues<dim>::value(const Point<dim> &p,
+                                  const unsigned int component) const {
+  USE(component);
+  return p.square();
 }
