@@ -87,3 +87,12 @@ double BoundaryValues<dim>::value(const Point<dim> &p,
   USE(component);
   return p.square();
 }
+
+template <int dim> Step4<dim>::Step4() : fe(2), dof_handler(triangulation) {}
+
+template <int dim> void Step4<dim>::make_grid() {
+  GridGenerator::hyper_cube<dim>(triangulation, -1, 1);
+  triangulation.refine_global(5);
+}
+
+template <int dim> void Step4<dim>::setup_system() {}
