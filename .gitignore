@@ -1,4 +1,6 @@
 .vscode/
+step5/build/
+step4/build/
 step3/.cache/
 step3/build/
 step2/build/.ninja_deps
