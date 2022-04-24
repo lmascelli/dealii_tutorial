@@ -1,6 +1,8 @@
 .vscode/
+step5/.cache/
 step5/build/
 step4/build/
+step4/.cache/
 step3/.cache/
 step3/build/
 step2/build/.ninja_deps
@@ -42,3 +44,5 @@ step3/build/CMakeFiles/3.23.1/CompilerIdCXX/a.out
 step3/build/CMakeFiles/3.23.1/CompilerIdCXX/CMakeCXXCompilerId.cpp
 step3/build/CMakeFiles/step3.dir/step3.cpp.o
 compile_commands.json
+step6/.cache/
+step6/build/

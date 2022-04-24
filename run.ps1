@@ -5,17 +5,19 @@ if (!$args[0]) {
 }
 else {
     $project = $args[0]
+    switch ($args[1]) {
+      'build' { $COMMAND_BUILD = $True }
+      'run' { $COMMAND_RUN = $True }
+      'clear' { $COMMAND_CLEAR = $True }
+      'new' { $COMMAND_NEW = $True}
+      $False {
+          Write-Output "Specify a command for ${args[0]}"
+      }
+    }
+
     if (Test-Path -PathType Container -Path "$project") {
         Push-Location $args[0]
-        switch ($args[1]) {
-            'build' { $COMMAND_BUILD = $True }
-            'run' { $COMMAND_RUN = $True }
-            'clear' { $COMMAND_CLEAR = $True }
-            $False {
-                Write-Output "Specify a command for ${args[0]}"
-            }
-        }
-    
+            
         if ($COMMAND_CLEAR) {
             Remove-Item -Force -Path 'build' -Recurse -ErrorAction Ignore 
         }
@@ -31,7 +33,7 @@ else {
             Copy-Item -Force -Path compile_commands.json -Destination ../..
             Pop-Location
         }
-        else {
+       else {
             Write-Output 'Command unkwown'
         }
         if ($COMMAND_RUN) {
@@ -42,6 +44,12 @@ else {
         Pop-Location
     }
     else {
-        Write-Output "project ${args[0]} not found"
+        if ($COMMAND_NEW) {
+          New-Item -ItemType Directory -Name $project
+          echo ($project + "/.cache/") >> .gitignore
+          echo ($project + "/build/") >> .gitignore
+        } else {
+         Write-Output "project ${args[0]} not found"
+        }
     }
 }
