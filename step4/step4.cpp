@@ -68,6 +68,14 @@ public:
 int main(int argc, char **argv) {
   USE(argc);
   USE(argv);
+  {
+    Step4<2> laplace_problem_2d;
+    laplace_problem_2d.run();
+  }
+  {
+    Step4<3> laplace_problem_3d;
+    laplace_problem_3d.run();
+  }
   return 0;
 }
 
@@ -77,7 +85,7 @@ double RightHandSide<dim>::value(const Point<dim> &p,
   USE(component);
   double return_value = 0.0;
   for (unsigned int i = 0; i < dim; ++i)
-    return_value += 4.0 + std::pow(p(i), 4.0);
+    return_value += 4.0 * std::pow(p(i), 4.0);
   return return_value;
 }
 
@@ -89,6 +97,14 @@ double BoundaryValues<dim>::value(const Point<dim> &p,
 }
 
 template <int dim> Step4<dim>::Step4() : fe(1), dof_handler(triangulation) {}
+
+template <int dim> void Step4<dim>::run() {
+  make_grid();
+  setup_system();
+  assemble_system();
+  solve();
+  output_results();
+}
 
 template <int dim> void Step4<dim>::make_grid() {
   GridGenerator::hyper_cube<dim>(triangulation, -1, 1);
@@ -124,6 +140,7 @@ template <int dim> void Step4<dim>::assemble_system() {
   for (const auto &cell : dof_handler.active_cell_iterators()) {
     fe_values.reinit(cell);
     cell_matrix = 0;
+    cell_rhs = 0;
 
     for (const unsigned int q_index : fe_values.quadrature_point_indices())
       for (const unsigned int i : fe_values.dof_indices()) {
@@ -151,4 +168,24 @@ template <int dim> void Step4<dim>::assemble_system() {
       dof_handler, 0, BoundaryValues<dim>(), boundary_values);
   MatrixTools::apply_boundary_values(boundary_values, system_matrix, solution,
                                      system_rhs);
+}
+
+template <int dim> void Step4<dim>::solve() {
+  SolverControl solver_control(1000, 1e-12);
+  SolverCG<Vector<double>> solver(solver_control);
+  solver.solve(system_matrix, solution, system_rhs, PreconditionIdentity());
+
+  std::cout << "  " << solver_control.last_step()
+            << "  CG iterations needed to obtain convergence." << std::endl;
+}
+
+template <int dim> void Step4<dim>::output_results() const {
+  DataOut<dim> data_out;
+  data_out.attach_dof_handler(dof_handler);
+  data_out.add_data_vector(solution, "solution");
+
+  data_out.build_patches();
+
+  std::ofstream output(dim == 2 ? "solution-2d.vtk" : "solution-3d.vtk");
+  data_out.write_vtk(output);
 }
