@@ -1,0 +1,10 @@
+/home/dealii/dealii_tutorial/step4/build/CMakeFiles/rebuild_cache.dir
+/home/dealii/dealii_tutorial/step4/build/CMakeFiles/info.dir
+/home/dealii/dealii_tutorial/step4/build/CMakeFiles/edit_cache.dir
+/home/dealii/dealii_tutorial/step4/build/CMakeFiles/strip_comments.dir
+/home/dealii/dealii_tutorial/step4/build/CMakeFiles/distclean.dir
+/home/dealii/dealii_tutorial/step4/build/CMakeFiles/runclean.dir
+/home/dealii/dealii_tutorial/step4/build/CMakeFiles/debug.dir
+/home/dealii/dealii_tutorial/step4/build/CMakeFiles/run.dir
+/home/dealii/dealii_tutorial/step4/build/CMakeFiles/release.dir
+/home/dealii/dealii_tutorial/step4/build/CMakeFiles/step4.dir
