@@ -46,6 +46,8 @@ else {
     else {
         if ($COMMAND_NEW) {
           New-Item -ItemType Directory -Name $project
+          Copy-Item -Path "step1/CMakeLists.txt" -Destination $project
+          New-Item -ItemType File -Path $project -Name ($project + ".cpp")
           echo ($project + "/.cache/") >> .gitignore
           echo ($project + "/build/") >> .gitignore
         } else {
