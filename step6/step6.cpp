@@ -60,6 +60,32 @@ double coefficient(const Point<dim> &p) {
 int main(int argc, char **argv) {
   USE(argc)
   USE(argv)
+  try {
+    Step6<2> laplace_problem_2d;
+    laplace_problem_2d.run();
+  } catch (std::exception &exc) {
+    std::cerr << std::endl
+              << std::endl
+              << "---------------------------------------------------"
+              << std::endl;
+    std::cerr << "Exception on processing:  " << std::endl
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "---------------------------------------------------"
+              << std::endl;
+    return 1;
+  } catch (...) {
+    std::cerr << std::endl
+              << std::endl
+              << "---------------------------------------------------"
+              << std::endl;
+
+    std::cerr << "Unknown exception!" << std::endl
+              << "Aborting!" << std::endl
+              << "---------------------------------------------------"
+              << std::endl;
+    return 1;
+  }
   return 0;
 }
 
@@ -140,4 +166,59 @@ void Step6<dim>::solve() {
 }
 
 template <int dim>
-void Step6<dim>::refine_grid() {}
+void Step6<dim>::refine_grid() {
+  Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
+
+  KellyErrorEstimator<dim>::estimate(dof_handler,
+                                     QGauss<dim - 1>(fe.degree + 1), {},
+                                     solution, estimated_error_per_cell);
+  GridRefinement::refine_and_coarsen_fixed_number(
+      triangulation, estimated_error_per_cell, 0.3, 0.03);
+  triangulation.execute_coarsening_and_refinement();
+}
+
+template <int dim>
+void Step6<dim>::output_results(const unsigned int cycle) const {
+  {
+    GridOut grid_out;
+    std::ofstream output("grid-" + std::to_string(cycle) + ".gnuplot");
+    GridOutFlags::Gnuplot gnuplot_flags(false, 5);
+    grid_out.set_flags(gnuplot_flags);
+    MappingQGeneric<dim> mapping(3);
+    grid_out.write_gnuplot(triangulation, output, &mapping);
+  }
+
+  {
+    DataOut<dim> data_out;
+    data_out.attach_dof_handler(dof_handler);
+    data_out.add_data_vector(solution, "solution");
+    data_out.build_patches();
+
+    std::ofstream output("solution-" + std::to_string(cycle) + ".vtu");
+    data_out.write_vtu(output);
+  }
+}
+
+template <int dim>
+void Step6<dim>::run() {
+  for (unsigned int cycle = 0; cycle < 9; ++cycle) {
+    std::cout << "Cycle " << cycle << ':' << std::endl;
+
+    if (cycle == 0) {
+      GridGenerator::hyper_ball(triangulation);
+      triangulation.refine_global(1);
+    } else
+      refine_grid();
+
+    std::cout << "  Number of active cells:     "
+              << triangulation.n_active_cells() << std::endl;
+
+    setup_system();
+    std::cout << "  Number of degrees of freedom: " << dof_handler.n_dofs()
+              << std::endl;
+
+    assemble_system();
+    solve();
+    output_results(cycle);
+  }
+}
