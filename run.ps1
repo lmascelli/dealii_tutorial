@@ -10,7 +10,7 @@ else {
       'run' { $COMMAND_RUN = $True }
       'clear' { $COMMAND_CLEAR = $True }
       'new' { $COMMAND_NEW = $True}
-      $False {
+      default {
           Write-Output "Specify a command for ${args[0]}"
       }
     }
