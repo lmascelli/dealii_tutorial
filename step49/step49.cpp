@@ -89,6 +89,22 @@ void grid_4() {
   print_mesh_info(out, "grid-4.vtu");
 }
 
+void grid_5() {
+  Triangulation<2> triangulation;
+  std::vector<unsigned int> repetitions(2);
+  repetitions[0] = 14;
+  repetitions[1] = 2;
+  GridGenerator::subdivided_hyper_rectangle(
+      triangulation, repetitions, Point<2>(0.0, 0.0), Point<2>(10.0, 1.0));
+  GridTools::transform(
+      [](const Point<2> &in) {
+        return Point<2>(in[0],
+                        in[1] + std::sin(dealii::numbers::PI * in[0] / 5.0));
+      },
+      triangulation);
+  print_mesh_info(triangulation, "grid-5.vtu");
+}
+
 int main(int argc, char **argv) {
   USE(argc)
   USE(argv)
@@ -98,6 +114,7 @@ int main(int argc, char **argv) {
     grid_2();
     grid_3();
     grid_4();
+    grid_5();
   } catch (std::exception &exc) {
     std::cerr << std::endl
               << std::endl
